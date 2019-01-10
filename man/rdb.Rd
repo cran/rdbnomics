@@ -6,7 +6,6 @@
 \usage{
 rdb(provider_code = NULL, dataset_code = NULL, ids = NULL,
   dimensions = NULL, mask = NULL,
-  api_base_url = "https://api.db.nomics.world/series?",
   verbose = getOption("rdbnomics.verbose_warning"), ...)
 }
 \arguments{
@@ -16,13 +15,13 @@ rdb(provider_code = NULL, dataset_code = NULL, ids = NULL,
 
 \item{ids}{Character string. DBnomics code of one or several series.}
 
-\item{dimensions}{Character string (single quote). DBnomics
-code of one or several dimensions in the specified provider and dataset.}
+\item{dimensions}{List or character string (single quoted). DBnomics
+code of one or several dimensions in the specified provider and dataset.
+If it is a named list, then the function \code{toJSON} (from the
+package \pkg{jsonlite}) is applied to generate the json object.}
 
-\item{mask}{Character string. DBnomics code of one or several dimensions
+\item{mask}{Character string. DBnomics code of one or several masks
 in the specified provider and dataset.}
-
-\item{api_base_url}{Character string. DBnomics API link.}
 
 \item{verbose}{Logical (default \code{getOption("rdbnomics.verbose_warning")}).
 Show warnings of the function.}
@@ -33,11 +32,12 @@ with the base function \code{readLines}. This can be used to get round the error
 \code{Could not resolve host: api.db.nomics.world}.}
 }
 \value{
-A data.frame.
+A \code{data.frame} or a \code{data.table}.
 }
 \description{
 \code{rdb} downloads data series from
-\href{https://db.nomics.world/}{DBnomics}.
+\href{https://db.nomics.world/}{DBnomics} using shortcuts like \code{ids},
+\code{dimensions} or \code{mask}.
 }
 \details{
 This function gives you access to hundreds of millions data series from
@@ -48,40 +48,62 @@ The code of each series is given on the
 }
 \examples{
 \dontrun{
-# By ids
+## By ids
 # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df1 <- rdb(ids='AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
-# Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df2 <- rdb(ids=c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN','AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
-# Fetch two series from different datasets of different providers:
-df3 <- rdb(ids=c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN','IMF/CPI/A.AT.PCPIT_IX'))
+df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 
-# By dimensions
+# Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
+df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
+
+# Fetch two series from different datasets of different providers:
+df3 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'IMF/CPI/A.AT.PCPIT_IX'))
+
+
+## By dimensions
 # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df1 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12"]}')
+df1 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = "ea12"))
+# or
+df1 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12"]}')
+
 # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df2 <- rdb('AMECO','ZUTN',dimensions='{"geo": ["ea12", "dnk"]}')
+df2 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = c("ea12", "dnk")))
+# or
+df2 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12", "dnk"]}')
+
 # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
-dim <- '{"country": ["DZ", "PE"],"indicator": ["ENF.CONT.COEN.COST.ZS","IC.REG.COST.PC.FE.ZS"]}'
+dim <- list(
+  country = c("DZ", "PE"),
+  indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")
+)
+df3 <- rdb('WB', 'DB', dimensions = dim)
+# or
+dim <- paste0(
+  '{"country": ["DZ", "PE"],',
+  '"indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}'
+)
 df3 <- rdb('WB', 'DB', dimensions = dim)
 
-# By mask (only for some providers, check the list here :
+
+## By mask (only for some providers, check the list here :
 # https://git.nomics.world/dbnomics/dbnomics-api/blob/master/dbnomics_api/application.cfg.)
 # Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
-df1 <- rdb('IMF','CPI',mask='M.DE.PCPIEC_WT')
-# Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
-df2 <- rdb('IMF','CPI',mask='M.DE+FR.PCPIEC_WT')
-# Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
-df3 <- rdb('IMF','CPI',mask='M..PCPIEC_WT')
-# Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
-df4 <- rdb('IMF','CPI',mask='M..PCPIEC_IX+PCPIA_IX')
+df1 <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT')
 
-# Use readLines before fromJSON to avoid a proxy failure
+# Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
+df2 <- rdb('IMF', 'CPI', mask = 'M.DE+FR.PCPIEC_WT')
+
+# Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
+df3 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_WT')
+
+# Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
+df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
+
+## Use readLines before fromJSON to avoid a proxy failure (in some cases)
 # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
 options(rdbnomics.use_readLines = TRUE)
-df1 <- rdb(ids='AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
 # or
-df1 <- rdb(ids='AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
+df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
 }
 }
 \seealso{
