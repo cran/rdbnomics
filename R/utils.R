@@ -4,28 +4,96 @@
 }
 
 #-------------------------------------------------------------------------------
-# read_lines
-read_lines <- function(x, y, run = 0) {
-  if (run > 0) { Sys.sleep(getOption("rdbnomics.sleep_run")) }
+# get_data
+get_data <- function(x, userl, curl_args, run = 0) {
+  if (run > 0) {
+    sys_sleep <- getOption("rdbnomics.sleep_run")
+    check_argument(sys_sleep, c("integer", "numeric"))
+    Sys.sleep(sys_sleep)
+  }
   
   tryCatch({
-    if (x) {
+    if (userl) {
+      # Only readLines
       if (as.numeric(R.Version()$major) >= 3) {
         if (as.numeric(R.Version()$minor) < 2) {
           suppressMessages(suppressWarnings(utils::setInternet2(TRUE)))
         }
       }
       
-      if (getOption("rdbnomics.verbose_warning_readLines")) {
-        y <- readLines(y)
+      verb_warn_rl <- getOption("rdbnomics.verbose_warning_readLines")
+      check_argument(verb_warn_rl, "logical")
+      if (verb_warn_rl) {
+        response <- try(readLines(x), silent = TRUE)
       } else {
-        y <- suppressWarnings(readLines(y))
+        response <- try(suppressWarnings(readLines(x)), silent = TRUE)
+      }
+
+      if (inherits(response, "try-error")) {
+        stop("BAD REQUEST", call. = FALSE)
+      } else {
+        jsonlite::fromJSON(response)
+      }
+    } else {
+      # With curl
+      if (!is.null(curl_args)) {
+        if (inherits(curl_args, "curl_handle")) {
+          curl_args <- list(handle = curl_args)
+        }
+        if (!inherits(curl_args, "list")) {
+          stop(
+            paste0(
+              "Argument 'curl_config' or option 'rdbnomics.curl_config' can ",
+              "only be of class 'curl_handle' or 'list'."
+            ),
+            call. = FALSE
+          )
+        }
+        if (inherits(curl_args, "list")) {
+          if (is.null(names(curl_args))) {
+            stop("The list 'curl_config' must be named.", call. = FALSE)
+          }
+          if (length(curl_args) <= 0) {
+            stop("The list 'curl_config' is empty.", call. = FALSE)
+          }
+          nm <- names(curl_args)
+          nm <- no_empty_char(nm)
+          if (length(curl_args) != length(nm)) {
+            stop("All elements of 'curl_config' must be named.", call. = FALSE)
+          }
+        }
+      }
+
+      response <- do.call(curl::curl_fetch_memory, c(list(url = x), curl_args))
+      check_x <- curl::parse_headers(response$headers)
+      check_x <- utils::head(check_x, 1)
+
+      http_ok <- getOption("rdbnomics.http_ok")
+      check_argument(http_ok, "character")
+      if (grepl(http_ok, toupper(check_x))) {
+        response <- rawToChar(response$content)
+        jsonlite::fromJSON(response)
+      } else {
+        stop(check_x, call. = FALSE)
       }
     }
-    jsonlite::fromJSON(y)
   }, error = function(e) {
-    if (run < getOption("rdbnomics.try_run")) {
-      read_lines(x, y, run = run + 1)
+    try_run <- getOption("rdbnomics.try_run")
+    check_argument(try_run, c("integer", "numeric"))
+    
+    myerror <- try(
+      grepl("'curl_config'", e$message) |
+      grepl("BAD[[:blank:]]+REQUEST", toupper(e$message)),
+      silent = TRUE
+    )
+    if (!inherits(myerror, "try-error")) {
+      if (myerror) {
+        try_run <- -1L
+      }
+    }
+
+    if (run < try_run) {
+      get_data(x, userl, curl_args, run = run + 1)
     } else {
       stop(e)
     }
@@ -36,7 +104,7 @@ read_lines <- function(x, y, run = 0) {
 # deploy
 deploy <- function(DT, columns = NULL, reference_column = "value") {
   if (!data.table::is.data.table(DT)) {
-    stop("DT is not a data.table.")
+    stop("DT is not a data.table.", call. = FALSE)
   }
 
   if (nrow(DT) <= 0) { return(DT) }
@@ -97,7 +165,7 @@ list_has_dataframe <- function(x) {
 #-------------------------------------------------------------------------------
 # no_empty_char
 no_empty_char <- function(x) {
-  if (inherits(x, "character") & length(x) > 1) {
+  if (inherits(x, "character")) {
     x <- x[x != "" & !is.na(x)]
   }
   x
@@ -135,7 +203,7 @@ get_version <- function(x) {
   } else if ("version" %in% names(x$`_meta`)) {
     api_version <- numeric_version(x$`_meta`$version)
   } else {
-    stop("Can't find the version.")
+    stop("Can't find the version.", call. = FALSE)
   }
   api_version <- unlist(api_version)
   api_version <- api_version[api_version != 0]
@@ -148,72 +216,78 @@ get_version <- function(x) {
 # authorized_version
 authorized_version <- function(x) {
   versions <- getOption("rdbnomics.authorized_api_version")
+  check_argument(versions, c("integer", "numeric"), len = FALSE)
 
   name <- deparse(substitute(versions))
   if (is.null(versions)) {
-    stop(paste0(name, " cannot be NULL."))
+    stop(paste0(name, " cannot be NULL."), call. = FALSE)
   }
   if (!inherits(versions, c("numeric", "integer"))) {
     stop(
-      paste0(name, " must be of class 'integer' or 'numeric'.")
+      paste0(name, " must be of class 'integer' or 'numeric'."),
+      call. = FALSE
     )
   }
   if (length(versions) <= 0) {
-    stop(paste0(name, " must be of length greater than 0."))
+    stop(paste0(name, " must be of length greater than 0."), call. = FALSE)
   }
   
   if (x %notin% versions) {
     stop(
       paste0(
         "Only versions ", paste0(versions, collapse = ", "), " are supported."
-      )
+      ),
+      call. = FALSE
     )
   }
   invisible()
 }
 
 #-------------------------------------------------------------------------------
+# trim
+trim <- function(x) {
+  gsub("^[[:blank:]]+|[[:blank:]]+$", "", x)
+}
+
+#-------------------------------------------------------------------------------
 # date_format
 date_format <- function(x) {
-  sum(grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", x)) == length(x)
+  x <- no_empty_char(x)
+  if (length(x) <= 0) {
+    return(FALSE)
+  }
+  sum(grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", trim(x)), na.rm = TRUE) == length(x)
 }
 
 #-------------------------------------------------------------------------------
 # timestamp_format
-timestamp_format <- function(x) {
-  sum(
-    grepl(
-      "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
-      x
-    )
-  ) == length(x)
+timestamp_format <- function(x, y) {
+  x <- no_empty_char(x)
+  if (length(x) <= 0) {
+    return(FALSE)
+  }
+  sum(grepl(y, trim(x)), na.rm = TRUE) == length(x)
 }
 
 #-------------------------------------------------------------------------------
-# timestamp_format2
-timestamp_format2 <- function(x) {
-  sum(
-    grepl(
-      "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]+Z$",
-      x
-    )
-  ) == length(x)
-}
-
-#-------------------------------------------------------------------------------
-# stopifnot_logical
+# check_argument
 check_argument <- function(x, type, len = TRUE, n = 1, not_null = TRUE) {
   name <- deparse(substitute(x))
   if (not_null) {
-    if (is.null(x)) { stop(paste0(name, " cannot be NULL.")) }
+    if (is.null(x)) { stop(paste0(name, " cannot be NULL."), call. = FALSE) }
   }
   if (!inherits(x, type)) {
     stop(
-      paste0(name, " must be of class '", paste0(type, collapse = "', '"), "'.")
+      paste0(
+        name, " must be of class '", paste0(type, collapse = "', '"), "'."
+      ),
+      call. = FALSE
     )
   }
   if (len) {
-    if (length(x) != n) { stop(paste0(name, " must be of length ", n, ".")) }
+    if (length(x) != n) {
+      stop(paste0(name, " must be of length ", n, "."), call. = FALSE)
+    }
   }
   invisible()
 }
@@ -222,12 +296,16 @@ check_argument <- function(x, type, len = TRUE, n = 1, not_null = TRUE) {
 # to_json_if_list
 to_json_if_list <- function(x) {
   if (inherits(x, "list")) {
-    if (is.null(names(x))) { stop("The list 'dimensions' must be named.") }
-    if (length(x) <= 0) { stop("The list 'dimensions' is empty.") }
+    if (is.null(names(x))) {
+      stop("The list 'dimensions' must be named.", call. = FALSE)
+    }
+    if (length(x) <= 0) {
+      stop("The list 'dimensions' is empty.", call. = FALSE)
+    }
     nm <- names(x)
     nm <- no_empty_char(nm)
     if (length(x) != length(nm)) {
-      stop("All elements of 'dimensions' must be named.")
+      stop("All elements of 'dimensions' must be named.", call. = FALSE)
     }
     return(jsonlite::toJSON(x))
   }
@@ -240,21 +318,91 @@ transform_date_timestamp <- function(DT) {
   timezone <- getOption("rdbnomics.timestamp_tz")
   check_argument(timezone, "character")
 
+  from_timestamp <- c(
+    "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+    "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]+Z$",
+    "^[0-9]{4}-[0-9]{2}-[0-9]{2}[[:blank:]]+[0-9]{2}:[0-9]{2}:[0-9]{2}$"
+  )
+
+  to_timestamp <- c(
+    "%Y-%m-%dT%H:%M:%SZ",
+    "%Y-%m-%dT%H:%M:%OSZ",
+    "%Y-%m-%d %H:%M:%S"
+  )
+
   DT[
     ,
     (colnames(DT)) := lapply(.SD, function(x) {
-      if (date_format(x)) {
-        return(as.Date(x))
-      }
-      if (timestamp_format(x)) {
-        return(as.POSIXct(x, tz = timezone, format = "%Y-%m-%dT%H:%M:%SZ"))
-      }
-      if (timestamp_format2(x)) {
-        return(as.POSIXct(x, tz = timezone, format = "%Y-%m-%dT%H:%M:%OSZ"))
+      if (inherits(x, "character")) {
+        if (date_format(x)) {
+          return(suppressWarnings(as.Date(x)))
+        }
+        for (i in seq_along(from_timestamp)) {
+          if (timestamp_format(x, from_timestamp[i])) {
+            return(
+              suppressWarnings(
+                as.POSIXct(x, tz = timezone, format = to_timestamp[i])
+              )
+            )
+          }
+        }
       }
       x
     }),
     .SDcols = colnames(DT)
   ]
   invisible()
+}
+
+#-------------------------------------------------------------------------------
+# avoid_partial_argument
+avoid_partial_argument <- function(x) {
+  x <- as.list(x)
+  x <- names(x)
+  x <- no_empty_char(x)
+  if (is.null(x)) {
+    return(invisible())
+  }
+  if (length(x) <= 0) {
+    return(invisible())
+  }
+
+  args_ok <- c(names(formals(rdb)), names(formals(rdb_by_api_link)))
+  args_ok <- args_ok[args_ok %notin% c("...", "api_link")]
+  if (length(setdiff(x, args_ok)) > 0) {
+    stop("Please avoid partial argument matching.", call. = FALSE)
+  }
+  invisible()
+}
+
+#-------------------------------------------------------------------------------
+# correct_argument
+correct_argument <- function() {
+  args_ok <- c(names(formals(rdb)), names(formals(rdb_by_api_link)))
+  args_ok[args_ok %notin% c("...", "api_link")]
+}
+
+#-------------------------------------------------------------------------------
+# call_ok
+call_ok <- function(x) {
+  x <- as.list(x)
+  x <- names(x)
+
+  modif_arg <- FALSE
+  if (is.null(x)) {
+    modif_arg <- TRUE
+  }
+  if (!is.null(x)) {
+    x <- no_empty_char(x)
+    if (length(x) <= 0) {
+      modif_arg <- TRUE
+    } else {
+      x <- pmatch(x, correct_argument(), duplicates.ok = TRUE)
+      if (sum(is.na(x)) <= 0) {
+        modif_arg <- TRUE
+      }
+    }
+  }
+
+  modif_arg
 }

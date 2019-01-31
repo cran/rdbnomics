@@ -5,15 +5,31 @@
 \title{Download informations about the last DBnomics updates.}
 \usage{
 rdb_last_updates(all = FALSE,
-  use_readLines = getOption("rdbnomics.use_readLines"))
+  use_readLines = getOption("rdbnomics.use_readLines"),
+  curl_config = getOption("rdbnomics.curl_config"))
 }
 \arguments{
-\item{all}{Logical (default \code{FALSE}). If \code{TRUE}, then the entire
+\item{all}{Logical (default \code{FALSE}). If \code{TRUE}, then the full
 dataset of the last updates is retrieved.}
 
 \item{use_readLines}{Logical (default \code{FALSE}). If \code{TRUE}, then
-the data are requested and read with the base function \code{readLines}.
-This can be used to get round the error \code{Could not resolve host: api.db.nomics.world}.}
+the data are requested and read with the base function \code{readLines} i.e.
+through the default R internet connection. This can be used to get round the
+error \code{Could not resolve host: api.db.nomics.world}.}
+
+\item{curl_config}{Curl_handle or list (default \code{NULL}). If not
+\code{NULL}, it is used to configure a proxy connection. This
+configuration is passed to the function \code{curl_fetch_memory} of the package
+\pkg{curl}. If it is a \code{curl_handle} object then it is considered to
+be the argument \code{handle} of \code{curl_fetch_memory}. In the case of a
+list, the names of the object are the arguments names of
+\code{curl_fetch_memory} (except \code{url} of course). It means that
+\code{curl_config = h} is equivalent to
+\code{curl_config = list(handle = h)}. \cr
+For \code{curl_fetch_memory} arguments see \code{\link[curl]{curl_fetch}}.
+For available curl options see \code{\link[curl]{curl_options}},
+\code{names(curl_options())} and
+\href{https://curl.haxx.se/libcurl/c/curl_easy_setopt.html}{libcurl}.}
 }
 \value{
 A \code{data.frame} or a \code{data.table}.

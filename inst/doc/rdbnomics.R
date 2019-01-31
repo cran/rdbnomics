@@ -111,6 +111,9 @@ ggplot(df, aes(x = period, y = value, color = series_code)) +
   dbnomics()
 
 ## ---- eval = FALSE-------------------------------------------------------
+#  df <- rdb('AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+
+## ---- eval = FALSE-------------------------------------------------------
 #  df <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN')) %>%
 #    filter(!is.na(value))
 
@@ -162,6 +165,9 @@ df %>%
 ggplot(df, aes(x = period, y = value, color = series_code)) +
   geom_step(size = 2) +
   dbnomics()
+
+## ---- eval = FALSE-------------------------------------------------------
+#  df <- rdb('IMF', 'CPI', 'M.DE.PCPIEC_WT')
 
 ## ---- eval = FALSE-------------------------------------------------------
 #  df <- rdb('IMF', 'CPI', mask = 'M.DE+FR.PCPIEC_WT') %>%
@@ -329,19 +335,39 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 #    Could not resolve host: api.db.nomics.world
 
 ## ---- eval = FALSE-------------------------------------------------------
-#  options(rdbnomics.use_readLines = TRUE)
-#  
+#  h <- curl::new_handle(
+#    proxy = "<proxy>",
+#    proxyport = <port>,
+#    proxyusername = "<username>",
+#    proxypassword = "<password>"
+#  )
+
+## ---- eval = FALSE-------------------------------------------------------
+#  options(rdbnomics.curl_config = h)
+
+## ---- eval = FALSE-------------------------------------------------------
+#  options(rdbnomics.curl_config = list(handle = h, arg = <...>))
+
+## ---- eval = FALSE-------------------------------------------------------
 #  df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
-#  
-#  df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
+
+## ---- eval = FALSE-------------------------------------------------------
+#  options(rdbnomics.curl = NULL)
+
+## ---- eval = FALSE-------------------------------------------------------
+#  df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', curl_config = h)
+
+## ---- eval = FALSE-------------------------------------------------------
+#  options(rdbnomics.use_readLines = TRUE)
+
+## ---- eval = FALSE-------------------------------------------------------
+#  df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+
+## ---- eval = FALSE-------------------------------------------------------
+#  options(rdbnomics.use_readLines = FALSE)
 
 ## ---- eval = FALSE-------------------------------------------------------
 #  df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
-#  
-#  df2 <- rdb(
-#    ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'),
-#    use_readLines = TRUE
-#  )
 
 ## ---- eval = FALSE-------------------------------------------------------
 #  dbnomics <- function(legend_title = "Code") {
