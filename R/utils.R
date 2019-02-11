@@ -127,15 +127,23 @@ deploy <- function(DT, columns = NULL, reference_column = "value") {
 
       # Transform lists into vectors
       if (is.null(columns)) {
-        y <- lapply(y, function(v) {
+        for (iv in names(y)) {
+          v <- y[[iv]]
           if (inherits(v, "list")) {
             v <- unlist(v)
-            if (length(v) != to_list_length) {
-              v <- paste(v, collapse = ",")
+            if (length(v) == 1) {
+              # New col
+              y[[iv]] <- paste0(trim(v), ",")
+            } else if ((length(v) == to_list_length + 1) | (length(v) == 2)) {
+              # New col
+              y[[iv]] <- paste0(trim(v[1]), ",", utils::tail(v, -1))
+            } else if (length(v) != to_list_length) {
+              y[[iv]] <- paste(unique(v), collapse = ",")
+            } else {
+              y[[iv]] <- v
             }
           }
-          v
-        })
+        }
       } else {
         for (i in columns) {
           y[[i]] <- unlist(y[[i]])
@@ -330,28 +338,37 @@ transform_date_timestamp <- function(DT) {
     "%Y-%m-%d %H:%M:%S"
   )
 
-  DT[
-    ,
-    (colnames(DT)) := lapply(.SD, function(x) {
-      if (inherits(x, "character")) {
-        if (date_format(x)) {
-          return(suppressWarnings(as.Date(x)))
-        }
-        for (i in seq_along(from_timestamp)) {
-          if (timestamp_format(x, from_timestamp[i])) {
-            return(
-              suppressWarnings(
-                as.POSIXct(x, tz = timezone, format = to_timestamp[i])
+  cols <- copy(colnames(DT))
+  cols <- cols[
+    (tolower(cols) != "observations_attributes") &
+    !grepl("name$", tolower(cols))
+  ]
+
+  if (length(cols) > 0) {
+    DT[
+      ,
+      (cols) := lapply(.SD, function(x) {
+        if (inherits(x, "character")) {
+          if (date_format(x)) {
+            return(suppressWarnings(as.Date(x)))
+          }
+          for (i in seq_along(from_timestamp)) {
+            if (timestamp_format(x, from_timestamp[i])) {
+              return(
+                suppressWarnings(
+                  as.POSIXct(x, tz = timezone, format = to_timestamp[i])
+                )
               )
-            )
+            }
           }
         }
-      }
-      x
-    }),
-    .SDcols = colnames(DT)
-  ]
-  invisible()
+        x
+      }),
+      .SDcols = cols
+    ]
+  }
+
+  invisible(DT)
 }
 
 #-------------------------------------------------------------------------------

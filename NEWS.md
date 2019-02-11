@@ -1,3 +1,7 @@
+# rdbnomics 0.4.6
+
+* Internal function `deploy` better handles recursive lists.
+
 # rdbnomics 0.4.5
 
 * The vignette "rdbnomics-tutorial" is now named "rdbnomics".
