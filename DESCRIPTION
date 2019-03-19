@@ -1,11 +1,11 @@
 Package: rdbnomics
 Type: Package
 Title: Download DBnomics Data
-Version: 0.4.6
+Version: 0.4.7
 Authors@R: c(person("Thomas", "Brand", role = c("aut"),
                      email = "thomas.brand@cepremap.org"),
              person("Sebastien", "Galais", role = c("cre", "ctb"),
-                     email = "Sebastien.GALAIS@banque-france.fr"))
+                     email = "s915.stem@gmail.com"))
 Description: R access to hundreds of millions data series from DBnomics API
     (<https://db.nomics.world/>).
 Depends: R (>= 3.1.0)
@@ -19,9 +19,9 @@ RoxygenNote: 6.1.1
 Suggests: knitr, rmarkdown, dplyr, magrittr, ggplot2, DT, testthat
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2019-02-10 22:39:25 UTC; sebas
+Packaged: 2019-03-18 21:37:27 UTC; sebas
 Author: Thomas Brand [aut],
   Sebastien Galais [cre, ctb]
-Maintainer: Sebastien Galais <Sebastien.GALAIS@banque-france.fr>
+Maintainer: Sebastien Galais <s915.stem@gmail.com>
 Repository: CRAN
-Date/Publication: 2019-02-11 11:50:03 UTC
+Date/Publication: 2019-03-19 11:00:03 UTC
