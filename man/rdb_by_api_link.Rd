@@ -6,7 +6,8 @@
 \usage{
 rdb_by_api_link(api_link,
   use_readLines = getOption("rdbnomics.use_readLines"),
-  curl_config = getOption("rdbnomics.curl_config"))
+  curl_config = getOption("rdbnomics.curl_config"),
+  filters = getOption("rdbnomics.filters"))
 }
 \arguments{
 \item{api_link}{Character string. DBnomics API link of the search.}
@@ -16,22 +17,26 @@ the data are requested and read with the base function \code{readLines} i.e.
 through the default R internet connection. This can be used to get round the
 error \code{Could not resolve host: api.db.nomics.world}.}
 
-\item{curl_config}{Curl_handle or list (default \code{NULL}). If not
+\item{curl_config}{Named list (default \code{NULL}). If not
 \code{NULL}, it is used to configure a proxy connection. This
 configuration is passed to the function \code{curl_fetch_memory} of the package
-\pkg{curl}. If it is a \code{curl_handle} object then it is considered to
-be the argument \code{handle} of \code{curl_fetch_memory}. In the case of a
-list, the names of the object are the arguments names of
-\code{curl_fetch_memory} (except \code{url} of course). It means that
-\code{curl_config = h} is equivalent to
-\code{curl_config = list(handle = h)}. \cr
+\pkg{curl}. A temporary \code{curl_handle} object is created internally
+with arguments equal to the provided list in \code{curl_config}.\cr
 For \code{curl_fetch_memory} arguments see \code{\link[curl]{curl_fetch}}.
 For available curl options see \code{\link[curl]{curl_options}},
 \code{names(curl_options())} and
 \href{https://curl.haxx.se/libcurl/c/curl_easy_setopt.html}{libcurl}.}
+
+\item{filters}{List (default \code{NULL}). This argument must be a named
+list for one filter because the function \code{toJSON} of the package \pkg{jsonlite}
+is used before sending the request to the server. For multiple filters,
+you have to provide a list of valid filters (see examples).\cr
+A valid filter is a named list with an element \code{code} which is a character string,
+and an element \code{parameters} which is a named list with elements \code{frequency}
+and \code{method} or a NULL.}
 }
 \value{
-A \code{data.frame} or a \code{data.table}.
+A \code{data.table}.
 }
 \description{
 \code{rdb_by_api_link} downloads data series from
@@ -66,7 +71,7 @@ df2 <- rdb_by_api_link(
 
 ## Use a specific proxy to fetch the data
 # Fetch one series from the dataset 'Doing Business' of WB provider :
-h <- curl::new_handle(
+h <- list(
   proxy = "<proxy>",
   proxyport = <port>,
   proxyusername = "<username>",
@@ -109,6 +114,32 @@ df2 <- rdb_by_api_link(
     '&observations=1&format=json&align_periods=1&offset=0&facets=0'
   ),
   use_readLines = TRUE
+)
+
+
+## Apply filter(s) to the series
+# One filter
+df3 <- rdb_by_api_link(
+  'https://api.db.nomics.world/v22/series/IMF/WEO/ABW.BCA?observations=1',
+  filters = list(
+    code = "interpolate",
+    parameters = list(frequency = "daily", method = "spline")
+  )
+)
+
+# Two filters
+df3 <- rdb_by_api_link(
+  'https://api.db.nomics.world/v22/series/IMF/WEO/ABW.BCA?observations=1',
+  filters = list(
+    list(
+      code = "interpolate",
+      parameters = list(frequency = "quarterly", method = "spline")
+    ),
+    list(
+      code = "aggregate",
+      parameters = list(frequency = "annual", method = "average")
+    )
+  )
 )
 }
 }

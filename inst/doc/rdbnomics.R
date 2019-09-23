@@ -15,7 +15,8 @@ library(rdbnomics)
 reorder_cols <- function(x) {
   cols <- c(
     "provider_code", "dataset_code", "dataset_name", "series_code",
-    "series_name", "original_period", "period", "value", "@frequency"
+    "series_name", "original_period", "period", "original_value", "value",
+    "@frequency"
   )
 
   if ("unit" %in% colnames(x)) {
@@ -46,12 +47,12 @@ scale_colour_discrete <- function(...) {
 
 knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
 
-dbnomics <- function(legend_title = "Code") {
+dbnomics <- function() {
   list(
     scale_x_date(expand = c(0, 0)),
+    scale_y_continuous(labels = function(x) { format(x, big.mark = " ") }),
     xlab(""),
     ylab(""),
-    guides(color = guide_legend(title = legend_title)),
     theme_bw(),
     theme(
       legend.position = "bottom", legend.direction = "vertical",
@@ -62,7 +63,7 @@ dbnomics <- function(legend_title = "Code") {
       legend.title = element_blank()
     ),
     annotate(
-      geom = "text", label = "DBnomics", 
+      geom = "text", label = "DBnomics <https://db.nomics.world>", 
       x = structure(Inf, class = "Date"), y = -Inf,
       hjust = 1.1, vjust = -0.4, col = "grey", 
       fontface = "italic"
@@ -107,7 +108,8 @@ df %>%
 
 ## ---- fig.align = 'center'-----------------------------------------------
 ggplot(df, aes(x = period, y = value, color = series_code)) +
-  geom_line(size = 2) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
   dbnomics()
 
 ## ---- eval = FALSE-------------------------------------------------------
@@ -128,7 +130,8 @@ df %>%
 
 ## ---- fig.align = 'center'-----------------------------------------------
 ggplot(df, aes(x = period, y = value, color = series_code)) +
-  geom_line(size = 2) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
   dbnomics()
 
 ## ---- eval = FALSE-------------------------------------------------------
@@ -146,7 +149,8 @@ df %>%
 
 ## ---- fig.align = 'center'-----------------------------------------------
 ggplot(df, aes(x = period, y = value, color = series_code)) +
-  geom_line(size = 2) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
   dbnomics()
 
 ## ---- eval = FALSE-------------------------------------------------------
@@ -163,7 +167,8 @@ df %>%
 
 ## ---- fig.align = 'center'-----------------------------------------------
 ggplot(df, aes(x = period, y = value, color = series_code)) +
-  geom_step(size = 2) +
+  geom_step(size = 1.2) +
+  geom_point(size = 2) +
   dbnomics()
 
 ## ---- eval = FALSE-------------------------------------------------------
@@ -184,7 +189,8 @@ df %>%
 
 ## ---- fig.align = 'center'-----------------------------------------------
 ggplot(df, aes(x = period, y = value, color = series_code)) +
-  geom_step(size = 2) +
+  geom_step(size = 1.2) +
+  geom_point(size = 2) +
   dbnomics()
 
 ## ---- eval = FALSE-------------------------------------------------------
@@ -232,7 +238,8 @@ df %>%
 
 ## ---- fig.align = 'center'-----------------------------------------------
 ggplot(df, aes(x = period, y = value, color = series_code)) +
-  geom_line(size = 2) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
   dbnomics()
 
 ## ---- eval = FALSE-------------------------------------------------------
@@ -253,7 +260,8 @@ df %>%
 
 ## ---- fig.align = 'center'-----------------------------------------------
 ggplot(df, aes(x = period, y = value, color = series_code)) +
-  geom_line(size = 2) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
   dbnomics()
 
 ## ---- eval = FALSE-------------------------------------------------------
@@ -274,7 +282,8 @@ df %>%
 
 ## ---- fig.align = 'center'-----------------------------------------------
 ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_line(size = 2) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
   dbnomics()
 
 ## ---- eval = FALSE-------------------------------------------------------
@@ -292,11 +301,12 @@ df %>%
 
 ## ---- fig.align = 'center'-----------------------------------------------
 ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_step(size = 2) +
+  geom_step(size = 1.2) +
+  geom_point(size = 2) +
   dbnomics()
 
 ## ---- eval = FALSE-------------------------------------------------------
-#  df <- rdb_by_api_link("https://api.db.nomics.world/v22/series?series_ids=BOE%2F8745%2FLPMB23A%2CBOE%2F8745%2FLPMB26A&observations=1&format=json&align_periods=1") %>%
+#  df <- rdb_by_api_link("https://api.db.nomics.world/v22/series?observations=1&series_ids=BOE/6008/RPMTDDC,BOE/6231/RPMTBVE") %>%
 #    filter(!is.na(value))
 
 ## ---- eval = TRUE, echo = FALSE------------------------------------------
@@ -310,7 +320,7 @@ df %<>%
       function(y) {
         paste0(
           paste0(
-            strsplit(y, "approvals ")[[1]], collapse = "approvals\n"
+            strsplit(y, "institutions' ")[[1]], collapse = "institutions'\n"
           ),
           "\n"
         )
@@ -326,7 +336,8 @@ df %>%
 
 ## ---- fig.align = 'center'-----------------------------------------------
 ggplot(df, aes(x = period, y = value, color = series_name)) +
-  geom_line(size = 2) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
   scale_y_continuous(labels = function(x) { format(x, big.mark = " ") }) +
   dbnomics()
 
@@ -335,7 +346,7 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 #    Could not resolve host: api.db.nomics.world
 
 ## ---- eval = FALSE-------------------------------------------------------
-#  h <- curl::new_handle(
+#  h <- list(
 #    proxy = "<proxy>",
 #    proxyport = <port>,
 #    proxyusername = "<username>",
@@ -346,7 +357,9 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 #  options(rdbnomics.curl_config = h)
 
 ## ---- eval = FALSE-------------------------------------------------------
-#  options(rdbnomics.curl_config = list(handle = h, arg = <...>))
+#  hndl <- curl::new_handle()
+#  curl::handle_setopt(hndl, .list = getOption("rdbnomics.curl_config"))
+#  curl::curl_fetch_memory(url = <...>, handle = hndl)
 
 ## ---- eval = FALSE-------------------------------------------------------
 #  df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
@@ -370,12 +383,56 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 #  df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
 
 ## ---- eval = FALSE-------------------------------------------------------
-#  dbnomics <- function(legend_title = "Code") {
+#  filters <- list(
+#    code = "interpolate",
+#    parameters = list(frequency = "monthly", method = "spline")
+#  )
+
+## ---- eval = FALSE-------------------------------------------------------
+#  df <- rdb(
+#    ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "AMECO/ZUTN/DNK.1.0.0.0.ZUTN"),
+#    filters = filters
+#  )
+
+## ---- eval = FALSE-------------------------------------------------------
+#  filters <- list(
+#    list(
+#      code = "interpolate",
+#      parameters = list(frequency = "monthly", method = "spline")
+#    ),
+#    list(
+#      code = "aggregate",
+#      parameters = list(frequency = "bi-annual", method = "end_of_period")
+#    )
+#  )
+#  
+#  df <- rdb(
+#    ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "AMECO/ZUTN/DNK.1.0.0.0.ZUTN"),
+#    filters = filters
+#  )
+
+## ---- eval = TRUE, echo = FALSE------------------------------------------
+df <- rdbnomics:::rdbnomics_df013
+
+## ---- echo = FALSE-------------------------------------------------------
+df %>%
+  arrange(filtered, series_name, period) %>%
+  reorder_cols() %>%
+  display_table()
+
+## ---- fig.align = 'center'-----------------------------------------------
+ggplot(filter(df, !is.na(value)), aes(x = period, y = value, color = series_name)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  dbnomics()
+
+## ---- eval = FALSE-------------------------------------------------------
+#  dbnomics <- function() {
 #    list(
 #      scale_x_date(expand = c(0, 0)),
+#      scale_y_continuous(labels = function(x) { format(x, big.mark = " ") }),
 #      xlab(""),
 #      ylab(""),
-#      guides(color = guide_legend(title = legend_title)),
 #      theme_bw(),
 #      theme(
 #        legend.position = "bottom", legend.direction = "vertical",
@@ -386,7 +443,7 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 #        legend.title = element_blank()
 #      ),
 #      annotate(
-#        geom = "text", label = "DBnomics",
+#        geom = "text", label = "DBnomics <https://db.nomics.world>",
 #        x = structure(Inf, class = "Date"), y = -Inf,
 #        hjust = 1.1, vjust = -0.4, col = "grey",
 #        fontface = "italic"
