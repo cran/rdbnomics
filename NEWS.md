@@ -1,3 +1,11 @@
+# rdbnomics 0.5.1
+
+* New argument 'query' for function `rdb()`.
+* New argument 'api_link' for function `rdb()` to replace `rdb_by_api_link()`.
+* New internal function `.rdb()` because `rdb_by_api_link()` is deprecated.
+* New function `dbnomics()` which is used in the vignette (@blu2ego, #2).
+* Small class correction for R 3.1.
+
 # rdbnomics 0.5.0
 
 * New filters tool from <https://editor.nomics.world/filters>.

@@ -4,9 +4,11 @@
 \alias{rdb_providers}
 \title{Download list of DBnomics providers.}
 \usage{
-rdb_providers(code = FALSE,
+rdb_providers(
+  code = FALSE,
   use_readLines = getOption("rdbnomics.use_readLines"),
-  curl_config = getOption("rdbnomics.curl_config"))
+  curl_config = getOption("rdbnomics.curl_config")
+)
 }
 \arguments{
 \item{code}{Logical (default \code{FALSE}). If \code{TRUE}, then only the
@@ -53,4 +55,7 @@ rdb_providers(curl_config = list(proxy = "<proxy>", proxyport = <port>))
 }
 \seealso{
 \code{\link{rdb_last_updates}}
+}
+\author{
+Sebastien Galais
 }

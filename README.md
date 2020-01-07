@@ -8,7 +8,7 @@
 
 This package provides you access to DBnomics data series. DBnomics is an open-source project with the goal of aggregating the world's economic data in one location, free of charge to the public. DBnomics covers hundreds of millions of series from international and national institutions (Eurostat, World Bank, IMF, ...).
 
-To use this package, you have to provide the codes of the provider, dataset and series you want. You can retrieve them directly on the <a href="https://db.nomics.world/" target="_blank">website</a>. You have access to the API through this <a href="http://api.db.nomics.world/" target="_blank">link</a> and the documentation is <a href="https://api.db.nomics.world/apidocs" target="_blank">here</a>.
+To use this package, you have to provide the codes of the provider, dataset and series you want. You can retrieve them directly on the <a href="https://db.nomics.world/" target="_blank">website</a>. You have access to the API through this <a href="http://api.db.nomics.world/" target="_blank">link</a> and the documentation is <a href="https://api.db.nomics.world/v22/apidocs" target="_blank">here</a>.
 
 DBnomics is hosted on its own <a href="https://git.nomics.world/" target="_blank">gitlab platform</a>. However, in order to install the package more easily, we created a mirror of this package on <a href="https://github.com/dbnomics/rdbnomics" target="_blank">github</a>.
 
@@ -32,68 +32,82 @@ vignette("rdbnomics")
 ```
 
 ## Examples
-Fetch time series by `ids`:
+### Fetch time series by `ids`:
 ```r
 # Fetch one series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 
 # Fetch two series from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df2 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'AMECO/ZUTN/DNK.1.0.0.0.ZUTN'))
+df2 <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "AMECO/ZUTN/DNK.1.0.0.0.ZUTN"))
 
 # Fetch two series from different datasets of different providers:
-df3 <- rdb(ids = c('AMECO/ZUTN/EA19.1.0.0.0.ZUTN', 'IMF/CPI/A.AT.PCPIT_IX'))
+df3 <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "IMF/BOP/A.FR.BCA_BP6_EUR"))
 ```
 
 In the event that you only use the argument `ids`, you can drop it and run:
 ```r
-df <- rdb('AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df <- rdb("AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 ```
 
-Fetch time series by `mask` :
+### Fetch time series by `mask` :
 ```r
-# Fetch one series from dataset 'Consumer Price Index' (CPI) of IMF:
-df1 <- rdb('IMF', 'CPI', mask = 'M.DE.PCPIEC_WT')
+# Fetch one series from dataset 'Balance of Payments' (BOP) of IMF:
+df1 <- rdb("IMF", "BOP", mask = "A.FR.BCA_BP6_EUR")
 
-# Fetch two series from dataset 'Consumer Price Index' (CPI) of IMF:
-df2 <- rdb('IMF', 'CPI', mask = 'M.DE+FR.PCPIEC_WT')
+# Fetch two series from dataset 'Balance of Payments' (BOP) of IMF:
+df2 <- rdb("IMF", "BOP", mask = "A.FR+ES.BCA_BP6_EUR")
 
-# Fetch all series along one dimension from dataset 'Consumer Price Index' (CPI) of IMF:
-df3 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_WT')
+# Fetch all series along one dimension from dataset 'Balance of Payments' (BOP) of IMF:
+df3 <- rdb("IMF", "BOP", mask = "A..BCA_BP6_EUR")
 
-# Fetch series along multiple dimensions from dataset 'Consumer Price Index' (CPI) of IMF:
-df4 <- rdb('IMF', 'CPI', mask = 'M..PCPIEC_IX+PCPIA_IX')
+# Fetch series along multiple dimensions from dataset 'Balance of Payments' (BOP) of IMF:
+df4 <- rdb("IMF", "BOP", mask = "A.FR.BCA_BP6_EUR+IA_BP6_EUR")
 ```
 
 In the event that you only use the arguments `provider_code`, `dataset_code` and `mask`, you can drop the name `mask` and run:
 ```r
-df <- rdb('IMF', 'CPI', 'M.DE.PCPIEC_WT')
+df4 <- rdb("IMF", "BOP", "A.FR.BCA_BP6_EUR")
 ```
 
-Fetch time series by `dimensions`:
+### Fetch time series by `dimensions`:
 ```r
 # Fetch one value of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df1 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = "ea12"))
+df1 <- rdb("AMECO", "ZUTN", dimensions = list(geo = "ea12"))
 # or
-df1 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12"]}')
+df1 <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea12"]}')
 
 # Fetch two values of one dimension from dataset 'Unemployment rate' (ZUTN) of AMECO provider:
-df2 <- rdb('AMECO', 'ZUTN', dimensions = list(geo = c("ea12", "dnk")))
+df2 <- rdb("AMECO", "ZUTN", dimensions = list(geo = c("ea12", "dnk")))
 # or
-df2 <- rdb('AMECO', 'ZUTN', dimensions = '{"geo": ["ea12", "dnk"]}')
+df2 <- rdb("AMECO", "ZUTN", dimensions = '{"geo": ["ea12", "dnk"]}')
 
 # Fetch several values of several dimensions from dataset 'Doing business' (DB) of World Bank:
-df3 <- rdb('WB', 'DB', dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")))
+df3 <- rdb("WB", "DB", dimensions = list(country = c("DZ", "PE"), indicator = c("ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS")))
 # or
-df3 <- rdb('WB', 'DB', dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}')
+df3 <- rdb("WB", "DB", dimensions = '{"country": ["DZ", "PE"], "indicator": ["ENF.CONT.COEN.COST.ZS", "IC.REG.COST.PC.FE.ZS"]}')
 ```
 
-Fetch one series from the dataset 'Doing Business' of WB provider with the link:
+### Fetch time series with a `query`:
 ```r
-df1 <- rdb_by_api_link('https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0')
+# Fetch one series from dataset 'WEO by countries' (WEO) of IMF provider:
+df1 <- rdb("IMF", "WEO", query = "France current account balance percent")
+
+# Fetch series from dataset 'WEO by countries' (WEO) of IMF provider:
+df2 <- rdb("IMF", "WEO", query = "current account balance percent")
+```
+
+### Fetch one series from the dataset 'Doing Business' of WB provider with the link:
+```r
+df1 <- rdb(api_link = "https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0")
+```
+
+In the event that you only use the argument `api_link`, you can drop the name and run:
+```r
+df1 <- rdb("https://api.db.nomics.world/v22/series/WB/DB?dimensions=%7B%22country%22%3A%5B%22FR%22%2C%22IT%22%2C%22ES%22%5D%7D&q=IC.REG.PROC.FE.NO&observations=1&format=json&align_periods=1&offset=0&facets=0")
 ```
 
 ## Proxy configuration or connection error `Could not resolve host`
-When using the functions `rdb` or `rdb_...`, you may come across the following error:
+When using the function `rdb`, you may come across the following error:
 ```r
 Error in open.connection(con, "rb") :
   Could not resolve host: api.db.nomics.world
@@ -130,7 +144,7 @@ curl::curl_fetch_memory(url = <...>, handle = hndl)
 ```
 After configuration, just use the standard functions of **rdbnomics** e.g.:
 ```r
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 ```
 This option of the package can be disabled with:
 ```r
@@ -138,9 +152,9 @@ options(rdbnomics.curl = NULL)
 ```
 
 #### Use the connection only for a function call
-If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the functions `rdb` and `rdb_...`:
+If a complete configuration is not needed but just an "on the fly" execution, then use the argument `curl_config` of the function `rdb`:
 ```r
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', curl_config = h)
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN", curl_config = h)
 ```
 
 ### Use the default R internet connection
@@ -153,7 +167,7 @@ options(rdbnomics.use_readLines = TRUE)
 ```
 And then use the standard function as follows:
 ```r
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN')
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN")
 ```
 This configuration can be disabled with:
 ```r
@@ -161,9 +175,9 @@ options(rdbnomics.use_readLines = FALSE)
 ```
 
 #### Use the connection only for a function call
-If you just want to do it once, you may use the argument `use_readLines` of the functions `rdb` and `rdb_...`:
+If you just want to do it once, you may use the argument `use_readLines` of the function `rdb`:
 ```r
-df1 <- rdb(ids = 'AMECO/ZUTN/EA19.1.0.0.0.ZUTN', use_readLines = TRUE)
+df1 <- rdb(ids = "AMECO/ZUTN/EA19.1.0.0.0.ZUTN", use_readLines = TRUE)
 ```
 
 ## Transform time series with filters
@@ -218,6 +232,8 @@ The content of two columns are modified:
 For some analysis, it is more convenient to have a `xts` object instead of a `data.table` object. To transform
 it, you can use the following functions:
 ```r
+library(xts)
+library(data.table)
 library(rdbnomics)
 
 to_xts <- function(
@@ -267,26 +283,30 @@ to_xts <- function(
   x
 }
 
-rdb("IMF", "CPI", mask = "M.DE+FR.PCPIEC_WT")
-#>      @frequency dataset_code               dataset_name          indexed_at original_period     period
-#>   1:    monthly          CPI Consumer Price Index (CPI) 2019-05-19 08:19:35         1996-01 1996-01-01
-#>   2:    monthly          CPI Consumer Price Index (CPI) 2019-05-19 08:19:35         1996-02 1996-02-01
-#>             ...          ...                        ...                 ...             ...        ...
-#> 569:    monthly          CPI Consumer Price Index (CPI) 2019-05-19 08:19:35         2019-02 2019-02-01
-#> 570:    monthly          CPI Consumer Price Index (CPI) 2019-05-19 08:19:35         2019-03 2019-03-01
+rdb("IMF", "BOP", mask = "A.FR+ES.BCA_BP6_EUR")
+#>      ... original_value     period provider_code REF_AREA Reference Area      series_code ...
+#>   1:                 NA 1940-01-01           IMF       ES          Spain A.ES.BCA_BP6_EUR
+#>   2:                 NA 1941-01-01           IMF       ES          Spain A.ES.BCA_BP6_EUR
+#>  ---                ...        ...           ...      ...            ...              ...                                                                    
+#> 159:           -15136.8 2018-01-01           IMF       FR         France A.FR.BCA_BP6_EUR
+#> 160:                 NA 2019-01-01           IMF       FR         France A.FR.BCA_BP6_EUR
 
-to_xts(rdb("IMF", "CPI", mask = "M.DE+FR.PCPIEC_WT"))
-#>            M.DE.PCPIEC_WT M.FR.PCPIEC_WT
-#> 1995-01-01             NA           20.0
-#> 1995-02-01             NA           20.0
-#>        ...            ...            ...
-#> 2019-02-01          30.10           25.8
-#> 2019-03-01          30.10           25.8
+to_xts(rdb("IMF", "BOP", mask = "A.FR+ES.BCA_BP6_EUR"))
+#>            A.ES.BCA_BP6_EUR A.FR.BCA_BP6_EUR
+#> 1940-01-01               NA               NA
+#> 1941-01-01               NA               NA
+#> 1942-01-01               NA               NA
+#>        ...              ...              ...
+#> 2017-01-01            31086       -16397.700
+#> 2018-01-01            23283       -15136.800
+#> 2019-01-01               NA               NA
 ```
 
 In the `xts` object, the series codes are used as column names. If you prefer
 the series names (or apply a function to them), you can utilize the function:
 ```r
+library(magrittr)
+
 rdb_rename_xts <- function(x, fun = NULL, ...) {
   nm <- xts::xtsAttributes(x)$codename
   cols <- nm$series_name[match(names(x), nm$series_code)]
@@ -298,28 +318,29 @@ rdb_rename_xts <- function(x, fun = NULL, ...) {
   x
 }
 
-library(magrittr)
-
-rdb("IMF", "CPI", mask = "M.DE+FR.PCPIEC_WT") %>%
+rdb("IMF", "BOP", mask = "A.FR+ES.BCA_BP6_EUR") %>%
   to_xts() %>%
   rdb_rename_xts()
-#>            Monthly – Germany – Communication, Weight Monthly – France – Communication, Weight
-#> 1995-01-01                                        NA                                     20.0
-#> 1995-02-01                                        NA                                     20.0
-#>        ...                                       ...                                      ...
-#> 2019-02-01                                     30.10                                     25.8
-#> 2019-03-01                                     30.10                                     25.8
+#>            Annual – Spain – Current Account, Total, Net, Euros Annual – France – Current Account, Total, Net, Euros
+#> 1940-01-01                                                  NA                                                   NA
+#> 1941-01-01                                                  NA                                                   NA
+#> 1942-01-01                                                  NA                                                   NA
+#>        ...                                                 ...                                                  ...
+#> 2017-01-01                                               31086                                           -16397.700
+#> 2018-01-01                                               23283                                           -15136.800
+#> 2019-01-01                                                  NA                                                   NA
 
-
-rdb("IMF", "CPI", mask = "M.DE+FR.PCPIEC_WT") %>%
+rdb("IMF", "BOP", mask = "A.FR+ES.BCA_BP6_EUR") %>%
   to_xts() %>%
   rdb_rename_xts(stringr::word, start = 3)
-#>            Germany France
-#> 1995-01-01      NA   20.0
-#> 1995-02-01      NA   20.0
-#>        ...     ...    ...
-#> 2019-02-01   30.10   25.8
-#> 2019-03-01   30.10   25.8
+#>            Spain     France  
+#> 1940-01-01    NA         NA
+#> 1941-01-01    NA         NA
+#> 1942-01-01    NA         NA
+#>        ...   ...        ...
+#> 2017-01-01 31086 -16397.700
+#> 2018-01-01 23283 -15136.800
+#> 2019-01-01    NA         NA
 ```
 
 ## P.S.

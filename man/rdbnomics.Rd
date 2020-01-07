@@ -3,8 +3,7 @@
 \docType{package}
 \name{rdbnomics}
 \alias{rdbnomics}
-\alias{rdbnomics-package}
 \title{Package rdbnomics}
 \description{
-DBnomics R client.
+DBnomics R client (<https://db.nomics.world/>).
 }
