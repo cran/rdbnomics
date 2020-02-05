@@ -1,6 +1,6 @@
-1b11947d9308678433774c38aaea1ebe *DESCRIPTION
+ea7bac5280ca6e92edb02da94889c02a *DESCRIPTION
 e382fd94b131156a8f7c628bdd76dcc8 *NAMESPACE
-8e9ba54c1a9e109c12a8be9651e17102 *NEWS.md
+a91776d680f8944051147568704209ab *NEWS.md
 5141b95cc468772793f9dc084215383f *R/dbnomics.R
 a32f71e3fd46e5cf35667d14613cc9f6 *R/dot_rdb.R
 479cf12e9b7e5f7a500734ba88675865 *R/rdb.R
@@ -9,13 +9,13 @@ df0c048ebd28d9c2d402e3396a8dbadc *R/rdb_by_api_link.R
 ae5d791ae4ac127a6ca17358fad37ea2 *R/rdb_providers.R
 4ba920927b28c01085b4c7c202173070 *R/rdbnomics.R
 d4c8432e0c0760f4cd5b81845afabd7a *R/sysdata.rda
-d0c516cd8bcc7580e653b9157d7d41c9 *R/utils.R
+62b49dc1da4e754e60c00bbb6646e2c1 *R/utils.R
 39aaba834a2dd721bccc3dcbdcbf737a *R/zzz.R
 d793796e88c38ccffb506a8f55cb49f6 *README.md
 b064f45ddabb14f8a586becdf0355cc3 *build/vignette.rds
 faa2935314b4671ed7183794d2edb021 *inst/doc/rdbnomics.R
 8587a8239e22874a02dc5d1f375b2527 *inst/doc/rdbnomics.Rmd
-6f735d8ad52c3bb87054efea09fadcbb *inst/doc/rdbnomics.html
+03b3937135f19e92c1f14a13d18f0f12 *inst/doc/rdbnomics.html
 51f0fe4504ec8e0c634b448d32216b58 *man/dbnomics.Rd
 54193b888f996476a11b1e5968e1ae04 *man/figures/logo.png
 4a723f1afc60b97d8c1a03b8e14bb7ee *man/rdb.Rd

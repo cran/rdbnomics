@@ -1,7 +1,7 @@
 Package: rdbnomics
 Type: Package
 Title: Download DBnomics Data
-Version: 0.5.1
+Version: 0.5.2
 Authors@R: c(person("Sebastien", "Galais", role = c("cre", "ctb"),
                      email = "s915.stem@gmail.com"),
              person("Thomas", "Brand", role = c("aut"),
@@ -19,9 +19,9 @@ RoxygenNote: 7.0.2
 Suggests: knitr, rmarkdown, dplyr, magrittr, ggplot2, DT, testthat
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2020-01-06 20:13:22 UTC; sebas
+Packaged: 2020-02-05 15:01:57 UTC; sebas
 Author: Sebastien Galais [cre, ctb],
   Thomas Brand [aut]
 Maintainer: Sebastien Galais <s915.stem@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-01-07 19:00:02 UTC
+Date/Publication: 2020-02-05 19:00:05 UTC
