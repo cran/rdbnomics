@@ -6,6 +6,7 @@ library <- function(...) {
 }
 
 ## -----------------------------------------------------------------------------
+library(data.table)
 library(magrittr)
 library(dplyr)
 library(ggplot2)
@@ -403,6 +404,124 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   dbnomics()
+
+## ---- eval = FALSE------------------------------------------------------------
+#  rdb_datasets(provider_code = "IMF")
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+str(rdbnomics:::rdbnomics_df016)
+
+## ---- eval = FALSE------------------------------------------------------------
+#  rdb_datasets(provider_code = c("IMF", "BDF"))
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+str(rdbnomics:::rdbnomics_df018)
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+rdbnomics:::rdbnomics_df018 %>%
+  sapply(function(y) { paste0(": ", nrow(y)) }) %>%
+  {
+    paste0("Number of datasets for ", names(.), " ", unname(.))
+  } %>%
+  cat(sep = "\n")
+
+## ---- eval = FALSE------------------------------------------------------------
+#  rdb_datasets(provider_code = "IMF", simplify = TRUE)
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+rdbnomics:::rdbnomics_df017 %>% display_table()
+
+## ---- eval = FALSE------------------------------------------------------------
+#  options(rdbnomics.progress_bar_datasets = TRUE)
+#  rdb_datasets()
+#  options(rdbnomics.progress_bar_datasets = FALSE)
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+rdbnomics:::rdbnomics_df019 %>%
+  {
+    data.table(Provider = names(.), `Number of datasets` = sapply(., nrow))
+  } %>%
+  .[order(Provider)] %>%
+  display_table()
+
+## ---- eval = FALSE------------------------------------------------------------
+#  rdb_dimensions(provider_code = "IMF", dataset_code = "WEO")
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+rdbnomics:::rdbnomics_df020 %$%
+  IMF %$%
+  WEO %>%
+  {
+    paste0("Number of dimensions for IMF/WEO : ", length(.))
+  } %>%
+  cat(sep = "\n")
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+rdbnomics:::rdbnomics_df020 %$%
+  IMF %$%
+  WEO %>%
+  .[[1]] %>%
+  display_table()
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+rdbnomics:::rdbnomics_df020 %$%
+  IMF %$%
+  WEO %>%
+  .[[2]] %>%
+  display_table()
+
+## ---- eval = FALSE------------------------------------------------------------
+#  rdb_dimensions(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+str(rdbnomics:::rdbnomics_df021)
+
+## ---- eval = FALSE------------------------------------------------------------
+#  options(rdbnomics.progress_bar_datasets = TRUE)
+#  rdb_dimensions()
+#  options(rdbnomics.progress_bar_datasets = FALSE)
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+rdbnomics:::rdbnomics_df022 %>%
+  .[order(Provider, Dataset)] %>%
+  head(100) %>%
+  display_table()
+
+# rdbnomics_df022 %>%
+#   sapply(function(u) {
+#     sapply(
+#       u,
+#       function(x) {
+#         sapply(
+#           x,
+#           function(y) {
+#             nrow(y)
+#           },
+#           simplify = FALSE
+#         ) %>%
+#           {
+#             data.table(Dimension = names(.), `Number of codes` = unname(.))
+#           }
+#       },
+#       simplify = FALSE
+#     ) %>%
+#     rbindlist(idcol = "Dataset")
+#   },
+#   simplify = FALSE
+# ) %>%
+#   rbindlist(idcol = "Provider")
+
+## ---- eval = FALSE------------------------------------------------------------
+#  rdb_series(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+rdbnomics:::rdbnomics_df023 %>%
+  display_table()
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+rdbnomics:::rdbnomics_df024 %>%
+  .[order(-`Number of series`)] %>%
+  display_table()
 
 ## ---- eval = FALSE------------------------------------------------------------
 #  Error in open.connection(con, "rb") :

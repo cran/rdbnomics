@@ -80,7 +80,7 @@
   # Checking if the limit has been reached
   num_found <- DBlist$series$num_found
   limit <- DBlist$series$limit
-  
+
   # Additional informations to translate geo, freq, ...
   if (!getOption("rdbnomics.translate_codes")) {
     additional_geo_column <- additional_geo_mapping <- NULL
@@ -142,7 +142,9 @@
 
     DBdata <- lapply(sequence, function(i) {
       # Modifying link
-      tmp_api_link <- paste0(api_link, sep, "offset=", i * limit)
+      tmp_api_link <- paste0(
+        api_link, sep, "offset=", format(i * limit, scientific = FALSE)
+      )
       # Fetching data
       DBlist <- get_data(tmp_api_link, use_readLines, curl_config)
 
