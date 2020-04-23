@@ -375,7 +375,7 @@ ggplot(df, aes(x = period, y = value, color = series_name)) +
 #    filter(!is.na(value))
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
-df <- rdbnomics:::rdbnomics_df012
+df <- head(rdbnomics:::rdbnomics_df012, 50)
 
 ## ---- echo = FALSE------------------------------------------------------------
 df %<>%
@@ -516,11 +516,19 @@ rdbnomics:::rdbnomics_df022 %>%
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
 rdbnomics:::rdbnomics_df023 %>%
+  head(100) %>%
   display_table()
+
+## ---- eval = FALSE------------------------------------------------------------
+#  rdb_series(provider_code = "IMF", dataset_code = "WEO", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
+
+## ---- eval = FALSE------------------------------------------------------------
+#  rdb_series(provider_code = "IMF", dataset_code = c("WEO", "WEOAGG"), query = "NGDP_RPCH")
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
 rdbnomics:::rdbnomics_df024 %>%
   .[order(-`Number of series`)] %>%
+  head(5) %>%
   display_table()
 
 ## ---- eval = FALSE------------------------------------------------------------
@@ -594,7 +602,7 @@ rdbnomics:::rdbnomics_df024 %>%
 #  )
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
-df <- rdbnomics:::rdbnomics_df013
+df <- head(rdbnomics:::rdbnomics_df013, 50)
 
 ## ---- echo = FALSE------------------------------------------------------------
 df %>%

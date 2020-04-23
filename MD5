@@ -1,6 +1,6 @@
-3cc17568cadbce813da5c268cf81f433 *DESCRIPTION
+25f5d334b8f5a2b3549623e9c468b8dd *DESCRIPTION
 58732a8691cbf46412b1d032a381c797 *NAMESPACE
-dcefaa5bdb07f3ab48669febde624e04 *NEWS.md
+b9a931dd53bde8e08ba47442c3ad222d *NEWS.md
 5141b95cc468772793f9dc084215383f *R/dbnomics.R
 3a946ea77943b5e1147b7512bbd3e581 *R/dot_rdb.R
 479cf12e9b7e5f7a500734ba88675865 *R/rdb.R
@@ -9,16 +9,16 @@ df0c048ebd28d9c2d402e3396a8dbadc *R/rdb_by_api_link.R
 bd605f343e8fb607be18a8b2c3d966e1 *R/rdb_dimensions.R
 8ad12ca480ec2e4c864320ddb3b07cb3 *R/rdb_last_updates.R
 577b434204b7b4aed0c29d8875db71f7 *R/rdb_providers.R
-d2abdc2568b2142c9bf69cbaa1df7fe1 *R/rdb_series.R
+ff8cd77e93185b2246577afb75f05bc3 *R/rdb_series.R
 83edf9a1e57047002cff5a801d451a13 *R/rdbnomics.R
 43ada643fafc943a14bc9920b97de0ba *R/sysdata.rda
 53d96156d0ef1a575c0bf9e5d170f9c2 *R/utils.R
 99a69f74560b53a61ee89c7a03f32605 *R/zzz.R
-acb63a2a41d3d1b101467e9e9a96a2cb *README.md
+9067df5b07143cf40d439bead26b0865 *README.md
 41f5293f3b6f34662147f5ef485fe411 *build/vignette.rds
-550c9cdd27e9b6a2f5b5677758bafc18 *inst/doc/rdbnomics.R
-b553387752505b937d1b31112ad1c3eb *inst/doc/rdbnomics.Rmd
-32b31d7f0d6f0c778fbd6e98a7183ba7 *inst/doc/rdbnomics.html
+ec3580d595961e9ee4bf117b016ac19e *inst/doc/rdbnomics.R
+71abb809f321912a30aded6299173534 *inst/doc/rdbnomics.Rmd
+3dfd22b7f68fa5b4a9f6da6ce18f7202 *inst/doc/rdbnomics.html
 51f0fe4504ec8e0c634b448d32216b58 *man/dbnomics.Rd
 4a723f1afc60b97d8c1a03b8e14bb7ee *man/rdb.Rd
 8a9ef40c5114f2c0be1c6fae63af9b76 *man/rdb_by_api_link.Rd
@@ -26,7 +26,7 @@ b553387752505b937d1b31112ad1c3eb *inst/doc/rdbnomics.Rmd
 63a6099707a167e62876bf57b3489809 *man/rdb_dimensions.Rd
 4e3a0f31c815ab1fc8b35febfde54a5a *man/rdb_last_updates.Rd
 c3ee813fb2d201890d87de111b82d948 *man/rdb_providers.Rd
-307664c9132119392b40207dce35bb74 *man/rdb_series.Rd
+ce1d4bdf85cd4f7806201b5efd9050c2 *man/rdb_series.Rd
 e6826b902bfc18a2a3570635a17b1acb *man/rdbnomics.Rd
 326c31d08a11df871813c2aa0128759e *tests/testthat.R
 8de9ebd7dab2bbfc9ef5163f10a3fd8b *tests/testthat/test-rdb.R
@@ -37,4 +37,4 @@ e98953a1eb427a74175b91efdad549e1 *vignettes/dbnomics001.png
 de513c0de5c2be3212c475914c98615d *vignettes/dbnomics003.png
 34946e93869403ca124b2ed6c5dab526 *vignettes/dbnomics004.png
 fab6a1c58f5207ef75d20afbf2f987a1 *vignettes/dbnomics005.png
-b553387752505b937d1b31112ad1c3eb *vignettes/rdbnomics.Rmd
+71abb809f321912a30aded6299173534 *vignettes/rdbnomics.Rmd
