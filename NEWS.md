@@ -1,3 +1,8 @@
+# rdbnomics 0.6.2
+
+* Remove **ggplot2**, **DT** and **dplyr** vignette dependencies.
+* Internal function `get_data` better handles errors.
+
 # rdbnomics 0.6.1
 
 * New arguments `dimensions` and `query` for the function `rdb_series()`.

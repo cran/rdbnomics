@@ -15,9 +15,12 @@ get_data <- function(x, userl, curl_args, headers = NULL, opt = NULL, run = 0) {
   tryCatch({
     if (userl) {
       # Only readLines
-      if (as.numeric(R.Version()$major) >= 3) {
+      if (as.numeric(R.Version()$major) == 3) {
         if (as.numeric(R.Version()$minor) < 2) {
-          suppressMessages(suppressWarnings(utils::setInternet2(TRUE)))
+          try(
+            suppressMessages(suppressWarnings(utils::setInternet2(TRUE))),
+            silent = TRUE
+          )
         }
       }
 
@@ -89,14 +92,32 @@ get_data <- function(x, userl, curl_args, headers = NULL, opt = NULL, run = 0) {
         response <- rawToChar(response$content)
 
         if (!is.null(jsonlite::fromJSON(response)$errors)) {
-          stop(
-            "\n",
-            jsonlite::fromJSON(response)$errors$message, " : ",
-            jsonlite::fromJSON(response)$errors$provider_code, "/",
-            jsonlite::fromJSON(response)$errors$dataset_code, "/",
-            jsonlite::fromJSON(response)$errors$series_code,
-            call. = FALSE
-          )
+          cat("\n")
+          for (ie in 1:nrow(jsonlite::fromJSON(response)$errors)) {
+            cat(
+              jsonlite::fromJSON(response)$errors[ie,]$message, " : ",
+              jsonlite::fromJSON(response)$errors[ie,]$provider_code, "/",
+              jsonlite::fromJSON(response)$errors[ie,]$dataset_code, "/",
+              jsonlite::fromJSON(response)$errors[ie,]$series_code,
+              "\n"
+            )
+          }
+        }
+
+        jsonnum <- try(
+          jsonlite::fromJSON(response)$series$num_found,
+          silent = TRUE
+        )
+        if (!inherits(jsonnum, "try-error")) {
+          if (!is.null(jsonnum)) {
+            if (jsonlite::fromJSON(response)$series$num_found <= 0) {
+              run <- 100
+              stop(
+                "Error when fetching the data.",
+                call. = FALSE
+              )
+            }
+          }
         }
 
         jsonlite::fromJSON(response)
@@ -571,7 +592,20 @@ get_geo_colname <- function(x) {
         ref_elt <- gsub(".*\\.", "", z)
         elt_ <- gsub('\\.', '"]][["', z)
         elt_ <- paste0('[["', elt_, '"]]')
-        c(codes[i], ref_elt, eval(parse(text = paste0("x", elt_))))
+        
+        res <- c(codes[i], ref_elt, eval(parse(text = paste0("x", elt_))))
+        if (length(res) > 0) {
+          if (res[2] == res[3]) {
+            if (res[3] == capital_first(res[3])) {
+              res[3] <- toupper(res[3])
+            } else {
+              res[3] <- capital_first(res[3])
+            }
+          }
+          res
+        } else {
+          res
+        }
       })
     },
     silent = TRUE
@@ -615,7 +649,33 @@ get_geo_names <- function(x, colname) {
             )[]
           )
         } else {
-          NULL
+          expr <- paste0(
+            "(", paste0(codes[i], collapse = "|"), ")*",
+            "\\.dimensions_value[s]*_label[s]*\\.(",
+            paste0(nm[i], collapse = "|"),
+            "){1}[0-9]*"
+          )
+
+          elt <- grep(expr, names(unlist(x)), value = TRUE)
+          for (y in nm) {
+            elt <- gsub(paste0(y, '\\..*'), y, elt)
+          }
+          elt <- gsub("[0-9]*$", "", elt)
+          elt <- unique(elt)
+
+          if (length(elt) > 0) {
+            elt_ <- gsub('\\.', '"]][["', elt)
+            elt_ <- paste0('[["', elt_, '"]]')
+            y <- eval(parse(text = paste0("x", elt_)))
+            suppressWarnings(
+              setnames(
+                data.table(X1 = codes[i], X2 = y[, 1], X3 = y[, 2]),
+                c("dataset_code", colname[[i]][2:3])
+              )[]
+            )
+          } else {
+            NULL
+          }
         }
       })
       DTs <- Filter(Negate(is.null), DTs)
@@ -887,4 +947,65 @@ get_geo_colname2 <- function(x, y) {
     return(y)
   }
   u
+}
+
+#-------------------------------------------------------------------------------
+# ellipsis_default
+ellipsis_default <- function(name, x, default) {
+  if (length(x) <= 0) {
+    return(default)
+  }
+  tmp <- x[[name]]
+  if (is.null(tmp)) {
+    return(default)
+  }
+  tmp
+}
+
+#-------------------------------------------------------------------------------
+# additional_info
+additional_info <- function(x) {
+  # Additional informations to translate geo, freq, ...
+  if (!getOption("rdbnomics.translate_codes")) {
+    additional_geo_column <- additional_geo_mapping <- NULL
+  } else {
+    additional_geo_column <- get_geo_colname(x)
+    additional_geo_mapping <- get_geo_names(x, additional_geo_column)
+    # Check coherence
+    if (is.null(additional_geo_column) | is.null(additional_geo_mapping)) {
+      additional_geo_column <- additional_geo_mapping <- NULL
+    }
+    if (!is.null(additional_geo_column) & !is.null(additional_geo_mapping)) {
+      if (length(additional_geo_column) != length(additional_geo_mapping)) {
+        if (
+          length(additional_geo_column) == 0 |
+          length(additional_geo_mapping) == 0
+        ) {
+          additional_geo_column <- additional_geo_mapping <- NULL
+        } else {
+          check_agc <- sapply(additional_geo_column, paste0, collapse = "|")
+          additional_geo_column <- stats::setNames(additional_geo_column, check_agc)
+
+          check_agm <- sapply(additional_geo_mapping, function(u) {
+            u1 <- u$dataset_code[1]
+            u2 <- colnames(u)[2:3]
+            u2 <- paste0(u2, collapse = "|")
+            paste0(u1, "|", u2)
+          })
+          additional_geo_mapping <- stats::setNames(additional_geo_mapping, check_agm)
+
+          keep <- intersect(check_agc, check_agm)
+
+          if (length(keep) == 0) {
+            additional_geo_column <- additional_geo_mapping <- NULL
+          } else {
+            additional_geo_column <- additional_geo_column[sort(keep)]
+            additional_geo_mapping <- additional_geo_mapping[sort(keep)]
+          }
+        }
+      }
+    }
+  }
+
+  list(additional_geo_column, additional_geo_mapping)
 }

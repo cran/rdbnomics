@@ -71,13 +71,7 @@ rdb_dimensions <- function(
   ...
 ) {
   # Additionals arguments
-  progress_bar <- TRUE
-  if (length(list(...)) > 0) {
-    tmp_progress_bar <- list(...)$progress_bar
-    if (!is.null(tmp_progress_bar)) {
-      progress_bar <- tmp_progress_bar
-    }
-  }
+  progress_bar <- ellipsis_default("progress_bar", list(...), TRUE)
   check_argument(progress_bar, "logical")
 
   # All providers
@@ -154,6 +148,15 @@ rdb_dimensions <- function(
           tmp1 <- as.list(tmp1)
           tmp1 <- data.table::data.table(A = unlist(tmp1), B = names(tmp1))
           tmp1 <- unique(tmp1)
+          # Normally column B is in capital letters
+          if (nrow(tmp1) > 0) {
+            tmp1[, EQUAL := as.numeric(A == B)]
+            tmp1[
+              EQUAL == 1,
+              A := ifelse(A == capital_first(A), toupper(A), capital_first(A))
+            ]
+            tmp1[, EQUAL := NULL]
+          }
         }
 
         tmp2 <- tmp$datasets$docs$dimensions_values_labels
