@@ -153,7 +153,7 @@ mtext(
 )
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  df <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "Eurostat/une_rt_q/Q.SA.TOTAL.PC_ACT.T.EA19"))
+#  df <- rdb(ids = c("AMECO/ZUTN/EA19.1.0.0.0.ZUTN", "Eurostat/une_rt_q/Q.SA.Y15-24.PC_ACT.T.EA19"))
 #  df <- df[!is.na(value)]
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
