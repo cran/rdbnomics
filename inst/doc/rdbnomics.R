@@ -489,7 +489,7 @@ mtext(
 )
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  df <- rdb("IMF", "WEO", query = "France current account balance percent")
+#  df <- rdb("IMF", "WEO:2019-10", query = "France current account balance percent")
 #  df <- df[!is.na(value))]
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
@@ -531,7 +531,7 @@ mtext(
 )
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  df <- rdb("IMF", "WEO", query = "current account balance percent")
+#  df <- rdb("IMF", "WEO:2019-10", query = "current account balance percent")
 #  df <- df[!is.na(value))]
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
@@ -744,26 +744,31 @@ DT <- DT[order(Provider)]
 display_table(DT)
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  rdb_dimensions(provider_code = "IMF", dataset_code = "WEO")
+#  rdb_dimensions(provider_code = "IMF", dataset_code = "WEO:2019-10")
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
 DT <- rdbnomics:::rdbnomics_df020
-DT <- DT$IMF$WEO
-DT <- paste0("Number of dimensions for IMF/WEO : ", length(DT))
+DT <- DT$IMF$`WEO:2019-10`
+DT <- paste0("Number of dimensions for IMF/WEO:2019-10 : ", length(DT))
 cat(DT, sep = "\n")
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
 DT <- rdbnomics:::rdbnomics_df020
-DT <- DT$IMF$WEO[[1]]
+DT <- DT$IMF$`WEO:2019-10`[[1]]
 display_table(DT)
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
 DT <- rdbnomics:::rdbnomics_df020
-DT <- DT$IMF$WEO[[2]]
+DT <- DT$IMF$`WEO:2019-10`[[2]]
+display_table(DT)
+
+## ---- eval = TRUE, echo = FALSE-----------------------------------------------
+DT <- rdbnomics:::rdbnomics_df020
+DT <- DT$IMF$`WEO:2019-10`[[3]]
 display_table(DT)
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  rdb_dimensions(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+#  rdb_dimensions(provider_code = "IMF", dataset_code = "WEO:2019-10", simplify = TRUE)
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
 str(rdbnomics:::rdbnomics_df021)
@@ -804,7 +809,7 @@ display_table(DT)
 #   rbindlist(idcol = "Provider")
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  rdb_series(provider_code = "IMF", dataset_code = "WEO", simplify = TRUE)
+#  rdb_series(provider_code = "IMF", dataset_code = "WEO:2019-10", simplify = TRUE)
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
 DT <- rdbnomics:::rdbnomics_df023
@@ -812,10 +817,10 @@ DT <- head(DT, 100)
 display_table(DT)
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  rdb_series(provider_code = "IMF", dataset_code = "WEO", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
+#  rdb_series(provider_code = "IMF", dataset_code = "WEO:2019-10", dimensions = list(`weo-subject` = "NGDP_RPCH"), simplify = TRUE)
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  rdb_series(provider_code = "IMF", dataset_code = c("WEO", "WEOAGG"), query = "NGDP_RPCH")
+#  rdb_series(provider_code = "IMF", dataset_code = c("WEO:2019-10", "WEOAGG:2019-10"), query = "NGDP_RPCH")
 
 ## ---- eval = TRUE, echo = FALSE-----------------------------------------------
 DT <- rdbnomics:::rdbnomics_df024
